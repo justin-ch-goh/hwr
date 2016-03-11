@@ -28,7 +28,7 @@ class Detail extends React.Component {
             {this.state.commits.map((commit, index) => {
                 const author = commit.author ? commit.author.login : 'Anonymous';
 
-                (<p key={index}>
+                return (<p key={index}>
                     <strong>{author}: </strong>
                     <a href={commit.html_url}>{commit.commit.message}</a>
                 </p>)
