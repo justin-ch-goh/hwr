@@ -14,39 +14,21 @@ class Detail extends React.Component {
     }
 
     componentWillMount() {
-        ajax.get('https://api.github.com/repos/facebook/react/commits')
+        this.fetchFeed('commits');
+        this.fetchFeed('forks');
+        this.fetchFeed('pulls');
+    }
+
+    fetchFeed(type) {
+        ajax.get(`https://api.github.com/repos/facebook/react/${type}`)
             .end((error, response) => {
                 if (!error && response) {
-                    console.dir(response.body);
-                    this.setState({ commits: response.body })
+                    this.setState({ [type]: response.body })
                 } else {
-                    console.log('Error fetching commits from GitHub');
+                    console.log('Error fetching ${type} from GitHub');
                 }
             }
         );
-
-        ajax.get('https://api.github.com/repos/facebook/react/forks')
-            .end((error, response) => {
-                if (!error && response) {
-                    console.dir(response.body);
-                    this.setState({ forks: response.body })
-                } else {
-                    console.log('Error fetching forks from GitHub');
-                }
-            }
-        );
-
-        ajax.get('https://api.github.com/repos/facebook/react/pulls')
-            .end((error, response) => {
-                if (!error && response) {
-                    console.dir(response.body);
-                    this.setState({ pulls: response.body })
-                } else {
-                    console.log('Error fetching pulls from GitHub');
-                }
-            }
-        );
-
     }
 
     showCommits() {
@@ -73,11 +55,15 @@ class Detail extends React.Component {
         }
 
         return (<div>
-            <button onClick={this.showCommits.bind(this)}>Show Commits</button>
-            <button onClick={this.showForks.bind(this)}>Show Forks</button>
-            <button onClick={this.showPulls.bind(this)}>Show Pulls</button>
+            <button onClick={this.selectMode.bind(this, 'commits')}>Show Commits</button>
+            <button onClick={this.selectMode.bind(this, 'forks')}>Show Forks</button>
+            <button onClick={this.selectMode.bind(this, 'pulls')}>Show Pulls</button>
             {content}
             </div>);
+    }
+
+    selectMode(mode) {
+        this.setState({ mode })
     }
 
     renderForks() {
@@ -85,8 +71,7 @@ class Detail extends React.Component {
             const owner = fork.owner ? fork.owner.login : 'Anonymous';
 
             return (<p key={index}>
-                <strong>{owner}</strong>: forked to 
-                <a href={fork.html_url}>{fork.html_url}</a> at {fork.created_at}.
+                <strong>{owner}</strong>: forked to <a href={fork.html_url}>{fork.html_url}</a> at {fork.created_at}.
             </p>);
         });
     }
